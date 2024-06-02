@@ -51,8 +51,9 @@ def generate_sentence(length, model):
     return output
 
 
-with open("input.txt", "r") as file:
+with open("input.txt", "r", encoding="utf-8") as file:
     text_input = file.read()
+
 
 model = markov_chain(text_input)
 
