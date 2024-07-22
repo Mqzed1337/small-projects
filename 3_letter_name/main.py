@@ -54,8 +54,13 @@ client = Client(
 )
 print("got api access")
 check = available_list
+final = []
 for i in check:
     if client.is_username_available(i):
         print(f'"{i}" is available')
+        final.append(i)
     else:
         print(f'"{i}" is not available')
+print("avaiable three letter names are: \n")
+for i in final:
+    print(i)
