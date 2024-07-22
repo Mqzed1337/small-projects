@@ -3,3 +3,4 @@ markov_chain/input.txt
 markov_chain/moby.txt
 *.env
 __pycache__/
+/nickname
