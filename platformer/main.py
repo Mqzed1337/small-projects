@@ -1,104 +1,101 @@
+import os
 import pygame
 
-pygame.init()
 
-ScreenWidth = pygame.display.set_mode((500, 500))
+RED = (255, 0, 0)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
-pygame.display.set_caption("Pygame Revision")
+screenWidth = 900
+screenHeight = 600
+fps = 60
 
-x = 50
-y = 425
-width = 60
-height = 80
-velocity = 0
+if not pygame.font:
+    print("Warning, fonts disabled")
+if not pygame.mixer:
+    print("Warning, sound disabled")
 
-isJump = False
-jumpCount = 10
-left = False
-right = False
-walkCount = 0
-
-clock = pygame.time.Clock()
-
-"""
-class player:
-    def __init__(self, x, y, xvel, gravity, width, height, drag, change):
-        self.x = x
-        self.y = y
-        self.xvel = xvel
-        self.gravity = gravity
-        self.yvel = 0
-        self.width = width
-        self.height = height
-        self.drag = drag
-        self.change = change
-
-    def draw(self, canvas):
-        pygame.draw.rect(canvas, (255, 0, 0), self.x, self.y, self.width, self.height)
-
-    def tick(self):
-        self.x += self.xvel
-        self.x *= self.drag
-        if self.collidelist(obstacles):
-            xvel = 0
-       
-        self.y += self.yvel
-        self.y -= self.gravity
-        if self.collidelist(obstacles):
-            yvel = 0
-
-        keys = pygame.key.get_pressed()
-
-        if keys[pygame.K_LEFT]:
-            self.xvel -= self.change
-   
-        if keys[pygame.K_RIGHT]:
-            self.xvel += self.change
+main_dir = os.path.split(os.path.abspath(__file__))[0]
+data_dir = os.path.join(main_dir, "data")
 
 
-obstacles = [pygame.rect(300, 450, 50, 50), pygame.rect(0, 500, 500, 1)]
-player1 = player(50, 425, 0, 1, 60, 80, 0.8, 2)
-"""
+# functions to create our resources
+def load_image(name, colorkey=None, scale=1):
+    fullname = os.path.join(data_dir, name)
+    image = pygame.image.load(fullname)
+    image = image.convert()
+
+    size = image.get_size()
+    size = (size[0] * scale, size[1] * scale)
+    image = pygame.transform.scale(image, size)
+
+    if colorkey is not None:
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey, pygame.RLEACCEL)
+    return image, image.get_rect()
 
 
-run = True
-while run:
-    x += velocity
-    velocity *= 0.8
+def load_sound(name):
+    class NoneSound:
+        def play(self):
+            pass
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
+    if not pygame.mixer or not pygame.mixer.get_init():
+        return NoneSound()
 
-    keys = pygame.key.get_pressed()
+    fullname = os.path.join(data_dir, name)
+    sound = pygame.mixer.Sound(fullname)
 
-    if keys[pygame.K_LEFT] and x > velocity:
-        velocity -= 2
+    return sound
 
-    if keys[pygame.K_RIGHT] and x < 500 - width - velocity:
-        velocity += 2
 
-    if not (isJump):
-        if keys[pygame.K_SPACE]:
-            isJump = True
-    else:
-        if jumpCount >= -10:
-            neg = 1
-            if jumpCount < 0:
-                neg = -1
-            y -= (jumpCount**2) * 0.3 * neg
-            jumpCount -= 1
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((50, 50))
+        self.image.fill(WHITE)
+        pass
 
-        else:
-            isJump = False
-            jumpCount = 10
+    def update(self):
+        pass
 
-    ScreenWidth.fill((0, 0, 0))
-    pygame.draw.rect(ScreenWidth, (255, 0, 0), (x, y, width, height))
+    pass
 
-    pygame.draw.rect(ScreenWidth, (0, 255, 0), (300, 450, 50, 50))
-    pygame.display.update()
 
-    clock.tick(60)
+class Obstacle:
+    pass
 
-pygame.quit()
+
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode((screenWidth, screenHeight), pygame.SCALED)
+    pygame.display.set_caption("Platformer")
+    pygame.mouse.set_visible(False)
+
+    background = pygame.Surface(screen.get_size())
+    background = background.convert()
+    background.fill((BLACK))
+
+    screen.blit(background, (0, 0))
+    pygame.display.flip()
+    going = True
+    clock = pygame.time.Clock()
+    player = Player()
+    while going:
+        clock.tick(fps)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                going = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                going = False
+
+        screen.blit(player.image, (100, 100))
+        pygame.display.flip()
+
+    pass
+
+
+if __name__ == "__main__":
+    main()
