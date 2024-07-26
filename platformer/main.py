@@ -55,9 +55,36 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.Surface((50, 50))
         self.image.fill(WHITE)
+        self.x_pos = 100
+        self.y_pos = 100
+        self.x_vel = 0
+        self.y_vel = 0
+        self.gravity = 0.8
+        self.friction = 0.9
+        self.speed = 2
+        self.jump_power = 10
+        self.can_jump = False
         pass
 
     def update(self):
+        self.x_pos += self.x_vel
+        self.y_pos += self.y_vel
+        self.y_vel += self.gravity
+        self.x_vel *= self.friction
+        if self.y_pos > screenHeight - 50:
+            self.y_pos = screenHeight - 50
+            self.y_vel = 0
+            self.can_jump = True
+        if self.x_pos > screenWidth - 50:
+            self.x_pos = screenWidth - 50
+        if self.x_pos < 0:
+            self.x_pos = 0
+        pass
+
+    def attempt_jump(self):
+        if self.can_jump:
+            self.y_vel -= self.jump_power
+            self.can_jump = False
         pass
 
     pass
@@ -90,8 +117,21 @@ def main():
                 going = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 going = False
+        keys = pygame.key.get_pressed()
+        """if keys[pygame.K_w]:
+            player.y_vel += player.speed
+        if keys[pygame.K_s]:
+            player.y_vel -= player.speed"""
+        if keys[pygame.K_a]:
+            player.x_vel -= player.speed
+        if keys[pygame.K_d]:
+            player.x_vel += player.speed
+        if keys[pygame.K_w]:
+            player.attempt_jump()
 
-        screen.blit(player.image, (100, 100))
+        player.update()
+        screen.blit(background, (0, 0))
+        screen.blit(player.image, (player.x_pos, player.y_pos))
         pygame.display.flip()
 
     pass
